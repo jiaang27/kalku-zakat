@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kalkulator Zakat Fitrah</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box}
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg,#0f2027,#2c5364);
+      overflow: hidden;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 420px;
+      height: 90vh;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(15px);
+      border-radius: 25px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .screen {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      padding: 25px;
+      transition: all 0.5s ease;
+      opacity: 0;
+      transform: translateX(100%);
+    }
+
+    .screen.active {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    h2 {
+      color: white;
+      margin-bottom: 20px;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 12px;
+      border: none;
+      font-size: 14px;
+    }
+
+    input, select {
+      background: rgba(255,255,255,0.9);
+    }
+
+    button {
+      background: linear-gradient(135deg,#43cea2,#185a9d);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    .result-box {
+      background: rgba(255,255,255,0.15);
+      padding: 20px;
+      border-radius: 15px;
+      color: white;
+      margin-top: 20px;
+      animation: fadeIn 1s ease;
+    }
+
+    @keyframes fadeIn {
+      from {opacity:0; transform: translateY(20px);} 
+      to {opacity:1; transform: translateY(0);} 
+    }
+
+    .title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 15px;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- SCREEN 1 -->
+  <div class="screen active" id="screen1">
+    <div class="title">🕌 Zakat Fitrah</div>
+    <h2>Data Keluarga</h2>
+    <input type="text" id="nama" placeholder="Nama Kepala Keluarga" />
+    <input type="number" id="anggota" placeholder="Jumlah Anggota" />
+
+    <select id="jenis" onchange="toggleInput()">
+      <option value="">Pilih Jenis Zakat</option>
+      <option value="beras">Beras</option>
+      <option value="uang">Uang</option>
+    </select>
+
+    <input type="number" id="harga" placeholder="Harga Beras / Kg" style="display:none" />
+
+    <button onclick="nextScreen()">Lanjut</button>
+  </div>
+
+  <!-- SCREEN 2 -->
+  <div class="screen" id="screen2">
+    <div class="title">✨ Hasil Zakat</div>
+    <div id="hasil" class="result-box"></div>
+    <button onclick="resetApp()">Hitung Ulang</button>
+  </div>
+
+</div>
+
+<script>
+function toggleInput(){
+  let jenis = document.getElementById('jenis').value;
+  let harga = document.getElementById('harga');
+  harga.style.display = (jenis === 'uang') ? 'block' : 'none';
+}
+
+function formatRupiah(angka){
+  return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+function nextScreen(){
+  let nama = document.getElementById('nama').value;
+  let anggota = parseInt(document.getElementById('anggota').value);
+  let jenis = document.getElementById('jenis').value;
+  let harga = parseInt(document.getElementById('harga').value);
+
+  if(!nama || !anggota || !jenis){
+    alert('Lengkapi data dulu!');
+    return;
+  }
+
+  if(jenis === 'uang' && !harga){
+    alert('Masukkan harga beras!');
+    return;
+  }
+
+  let hasilText = '';
+
+  if(jenis === 'beras'){
+    let total = anggota * 2.5;
+    hasilText = `
+      <p>Nama: <b>${nama}</b></p>
+      <p>Anggota: ${anggota}</p>
+      <p>Total: <b>${total} kg beras</b></p>
+    `;
+  } else {
+    let perOrang = 2.5 * harga;
+    let total = anggota * perOrang;
+    hasilText = `
+      <p>Nama: <b>${nama}</b></p>
+      <p>Anggota: ${anggota}</p>
+      <p>Zakat/orang: ${formatRupiah(perOrang)}</p>
+      <p>Total: <b>${formatRupiah(total)}</b></p>
+    `;
+  }
+
+  document.getElementById('hasil').innerHTML = hasilText;
+
+  document.getElementById('screen1').classList.remove('active');
+  document.getElementById('screen2').classList.add('active');
+}
+
+function resetApp(){
+  location.reload();
+}
+</script>
+
+</body>
+</html>
